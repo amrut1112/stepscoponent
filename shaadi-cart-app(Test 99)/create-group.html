@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Wedding Group - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="app-header">
+            <div class="logo">ShaadiCart</div>
+        </div>
+        
+        <div class="auth-card card">
+            <h1 class="auth-title">Create Your Wedding Group</h1>
+            
+            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            
+            <form id="create-group-form">
+                <div class="form-group">
+                    <label for="wedding-name" class="form-label">Wedding Name</label>
+                    <input type="text" id="wedding-name" class="form-control" required placeholder="Your Name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="role" class="form-label">Your Role</label>
+                    <select id="role" class="form-control" required>
+                        <option value="">Your Role</option>
+                        <option value="bride">Bride</option>
+                        <option value="groom">Groom</option>
+                        <option value="family">Family Member</option>
+                        <option value="planner">Wedding Planner</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wedding-date" class="form-label">Wedding Date</label>
+                    <input type="date" id="wedding-date" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-block">Create Group & Continue</button>
+            </form>
+            
+            <div class="auth-footer" style="text-align:center; margin-top: 1rem;">
+                <p>Already have an account? <a href="login.html" class="auth-link">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            try {
+                const isLoggedIn = await window.supabaseClient.isAuthenticated();
+                if (!isLoggedIn) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const createGroupForm = document.getElementById('create-group-form');
+                const errorMessage = document.getElementById('error-message');
+                
+                createGroupForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const weddingName = document.getElementById('wedding-name').value;
+                    const role = document.getElementById('role').value;
+                    const weddingDate = document.getElementById('wedding-date').value;
+                    
+                    try {
+                        errorMessage.style.display = 'none';
+                        // Get current user
+                        const user = await window.supabaseClient.getCurrentUser();
+                        // Generate invite code
+                        const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+                        // Create wedding group
+                        const group = await window.supabaseClient.createWeddingGroup(weddingName, weddingDate, user.id, inviteCode);
+                        // Add user to group
+                        await window.supabaseClient.addUserToGroup(group.id, user.id, role);
+                        // Store current group ID
+                        localStorage.setItem('currentGroupId', group.id);
+                        // Redirect to dashboard
+                        window.location.href = 'dashboard.html';
+                    } catch (error) {
+                        console.error('Error creating wedding group:', error);
+                        errorMessage.textContent = error.message || 'Failed to create wedding group. Please try again.';
+                        errorMessage.style.display = 'block';
+                    }
+                });
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Basic client-side validation for input fields
+        function validateInput(inputElement) {
+            if (inputElement.checkValidity()) {
+                inputElement.classList.remove('is-invalid');
+                inputElement.classList.add('is-valid');
+            } else {
+                inputElement.classList.remove('is-valid');
+                inputElement.classList.add('is-invalid');
+            }
+        }
+
+        const weddingNameInput = document.getElementById('wedding-name');
+        const roleSelect = document.getElementById('role');
+        const weddingDateInput = document.getElementById('wedding-date');
+
+        weddingNameInput.addEventListener('input', () => validateInput(weddingNameInput));
+        weddingNameInput.addEventListener('blur', () => validateInput(weddingNameInput));
+
+        roleSelect.addEventListener('change', () => validateInput(roleSelect));
+        roleSelect.addEventListener('blur', () => validateInput(roleSelect));
+
+        weddingDateInput.addEventListener('input', () => validateInput(weddingDateInput));
+        weddingDateInput.addEventListener('blur', () => validateInput(weddingDateInput));
+
+    </script>
+</body>
+</html>

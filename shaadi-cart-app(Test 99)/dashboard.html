@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container" style="padding-bottom: 70px;">
+        <div id="wedding-info" class="card mb-3" style="position: relative;">
+            <span style="position: absolute; top: 1.5rem; right: 1.5rem; font-size: 1.7rem; color: #2d4c3f;">
+                <i class="fas fa-bell"></i>
+            </span>
+            <h1 id="wedding-name" style="margin-bottom: 0.5rem;">Priya & Rohan's Wedding</h1>
+            <div style="background: #f8f8e7; border-radius: 1rem; padding: 1rem; margin-bottom: 1rem;">
+                <div style="font-size: 1rem; color: #2d4c3f; font-weight: 600; letter-spacing: 1px;">WEDDING DATE</div>
+                <div id="wedding-date" style="font-size: 2rem; font-weight: bold; color: #2d4c3f;">July 10, 2024</div>
+                <div id="days-remaining" style="font-size: 1.1rem; color: #2d4c3f;">90 days to go</div>
+            </div>
+        </div>
+        <div style="margin-bottom: 1.5rem;">
+            <div style="font-weight: 600; color: #2d4c3f; letter-spacing: 1px; margin-bottom: 0.5rem;">QUICK NAVIGATION</div>
+            <div class="grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <a href="budget/budget.html" class="quick-nav-item">
+                    <div><i class="fas fa-money-bill-wave"></i></div>
+                    <div>Budget Tracker</div>
+                    <div>Manage expenses</div>
+                </a>
+                <a href="shopping/shopping.html" class="quick-nav-item">
+                    <div><i class="fas fa-list"></i></div>
+                    <div>Shopping Lists</div>
+                    <div>View your lists</div>
+                </a>
+                <a href="tasks.html" class="quick-nav-item">
+                    <div><i class="fas fa-check-circle"></i></div>
+                    <div>Quick Tasks</div>
+                    <div>Track to-dos</div>
+                </a>
+                <a href="vendors.html" class="quick-nav-item">
+                    <div><i class="fas fa-store"></i></div>
+                    <div>Vendor List</div>
+                    <div>Browse vendors</div>
+                </a>
+            </div>
+        </div>
+        <div style="font-weight: 600; color: #2d4c3f; letter-spacing: 1px; margin-bottom: 0.5rem;">RECENT ACTIVITY</div>
+        <div id="recent-activity" class="card">
+            <div id="loading" class="loading-container">
+                <div class="spinner"></div>
+            </div>
+            <div id="activity-list">
+                <!-- Activity items will be dynamically inserted here -->
+            </div>
+        </div>
+        
+        <!-- Priority Highlights -->
+        <div style="font-weight: 600; color: #2d4c3f; letter-spacing: 1px; margin-bottom: 0.5rem; margin-top: 1.5rem;">PRIORITY HIGHLIGHTS</div>
+        <div id="priority-highlights" class="card">
+            <div id="priority-loading" class="loading-container" style="display: none;">
+                <div class="spinner"></div>
+            </div>
+            <div id="priority-list">
+                <!-- Priority items will be dynamically inserted here -->
+                <p class="text-center">Loading priority items...</p>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item active">
+            <i class="fas fa-home nav-icon"></i>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="shopping/shopping.html" class="nav-item">
+            <i class="fas fa-list nav-icon"></i>
+            <span class="nav-text">Shopping</span>
+        </a>
+        <a href="tasks.html" class="nav-item">
+            <i class="fas fa-check-circle nav-icon"></i>
+            <span class="nav-text">Tasks</span>
+        </a>
+        <a href="vendors.html" class="nav-item">
+            <i class="fas fa-store nav-icon"></i>
+            <span class="nav-text">Vendors</span>
+        </a>
+        <a href="budget/budget.html" class="nav-item">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span class="nav-text">Budget</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">Profile</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        // Dashboard functionality
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Check authentication
+                const isLoggedIn = await window.supabaseClient.isAuthenticated();
+                if (!isLoggedIn) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Get current user
+                const user = await window.supabaseClient.getCurrentUser();
+                
+                // Get user's wedding groups
+                const groups = await window.supabaseClient.getUserGroups(user.id);
+                
+                if (groups.length === 0) {
+                    // No groups, redirect to index page
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                // Use the first group (or could implement group selection)
+                const currentGroup = groups[0];
+                
+                // Store current group ID
+                localStorage.setItem('currentGroupId', currentGroup.id);
+                
+                // Update wedding info
+                document.getElementById('wedding-name').textContent = currentGroup.name;
+                
+                // Format wedding date
+                const weddingDate = new Date(currentGroup.weddingDate);
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                document.getElementById('wedding-date').textContent = weddingDate.toLocaleDateString('en-US', options);
+                
+                // Calculate days remaining
+                const today = new Date();
+                const timeDiff = weddingDate.getTime() - today.getTime();
+                const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                document.getElementById('days-remaining').textContent = 
+                    daysRemaining > 0 ? `${daysRemaining} days to go` : 'Wedding day has arrived!';
+                
+                // Load recent activity
+                await loadRecentActivity(currentGroup.id);
+                
+                // Load priority highlights
+                await loadPriorityHighlights(currentGroup.id);
+                
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                alert('Failed to load dashboard. Please try again.');
+            }
+        });
+        
+        // Load recent activity
+        async function loadRecentActivity(groupId) {
+            const loading = document.getElementById('loading');
+            const activityList = document.getElementById('activity-list');
+            
+            try {
+                // Show loading
+                loading.style.display = 'flex';
+                activityList.innerHTML = '';
+                
+                // Get recent transactions
+                const { data: transactions, error: transactionsError } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('group_id', groupId)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (transactionsError) throw transactionsError;
+                
+                // Get recent shopping item updates
+                const { data: shoppingItems, error: shoppingError } = await supabase
+                    .from('shopping_items')
+                    .select(`
+                        id,
+                        name,
+                        purchased,
+                        created_at,
+                        category_id,
+                        shopping_categories (name)
+                    `)
+                    .eq('shopping_categories.group_id', groupId)
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (shoppingError) throw shoppingError;
+                
+                // Hide loading
+                loading.style.display = 'none';
+                
+                // Combine and sort activities
+                const activities = [
+                    ...transactions.map(t => ({
+                        type: 'transaction',
+                        date: new Date(t.created_at),
+                        data: t
+                    })),
+                    ...shoppingItems.map(i => ({
+                        type: 'shopping_item',
+                        date: new Date(i.created_at),
+                        data: i
+                    }))
+                ];
+                
+                activities.sort((a, b) => b.date - a.date);
+                
+                // Display activities
+                if (activities.length === 0) {
+                    activityList.innerHTML = '<p class="text-center">No recent activity</p>';
+                    return;
+                }
+                
+                // Format and display each activity
+                for (const activity of activities.slice(0, 5)) {
+                    const activityItem = document.createElement('div');
+                    
+                    const dateStr = formatDate(activity.date);
+                    
+                    if (activity.type === 'transaction') {
+                        const transaction = activity.data;
+                        activityItem.innerHTML = `
+                            <div class="flex justify-between">
+                                <div>Added "${transaction.description}" expense</div>
+                                <div>${dateStr}</div>
+                            </div>
+                            <div>₹${transaction.amount.toLocaleString()}</div>
+                        `;
+                    } else {
+                        const item = activity.data;
+                        activityItem.innerHTML = `
+                            <div class="flex justify-between">
+                                <div>Added "${item.name}" to ${item.shopping_categories.name}</div>
+                                <div>${dateStr}</div>
+                            </div>
+                        `;
+                    }
+                    
+                    activityList.appendChild(activityItem);
+                }
+                
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                loading.style.display = 'none';
+                activityList.innerHTML = '<p class="text-center text-danger">Failed to load recent activity</p>';
+            }
+        }
+        
+        // Format date
+        function formatDate(date) {
+            const options = { month: 'short', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Load priority highlights (e.g., upcoming tasks or vendor payments)
+        async function loadPriorityHighlights(groupId) {
+            const loading = document.getElementById('priority-loading');
+            const priorityList = document.getElementById('priority-list');
+
+            try {
+                loading.style.display = 'flex';
+                priorityList.innerHTML = ''; // Clear previous content
+
+                // Fetch upcoming tasks (e.g., due in the next 30 days and not completed)
+                const { data: upcomingTasks, error: tasksError } = await supabase
+                    .from('tasks')
+                    .select('id, description, due_date, is_completed')
+                    .eq('group_id', groupId)
+                    .eq('is_completed', false)
+                    .gte('due_date', new Date().toISOString().split('T')[0]) // Due date is today or in the future
+                    .order('due_date', { ascending: true })
+                    .limit(5); // Show top 5 upcoming tasks
+
+                if (tasksError) throw tasksError;
+
+                loading.style.display = 'none';
+
+                if (upcomingTasks.length === 0) {
+                    priorityList.innerHTML = '<p class="text-center text-muted">No upcoming priority items.</p>';
+                    return;
+                }
+
+                // Display upcoming tasks
+                upcomingTasks.forEach(task => {
+                    const taskElement = document.createElement('div');
+                    taskElement.className = 'mb-2 p-2 card'; // Use card style for each highlight
+                    const dueDateStr = task.due_date ? `: Due ${formatDate(new Date(task.due_date))}` : '';
+                    taskElement.innerHTML = `
+                        <div>
+                            <strong>Task:</strong> ${task.description}${dueDateStr}
+                        </div>
+                    `;
+                    priorityList.appendChild(taskElement);
+                });
+
+            } catch (error) {
+                console.error('Error loading priority highlights:', error);
+                loading.style.display = 'none';
+                priorityList.innerHTML = '<p class="text-center text-danger">Failed to load priority items.</p>';
+            }
+        }
+
+    </script>
+</body>
+</html>

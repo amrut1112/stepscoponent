@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Items - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container" style="padding-bottom: 70px;">
+        <div class="flex justify-between items-center p-2 flex-wrap">
+            <button class="btn btn-secondary" style="font-size: 1rem; padding: 5px 10px;" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+            <h1 id="category-name">Shopping Items</h1>
+            <button id="add-item-btn" class="btn" style="font-size: 1.5rem; padding: 5px 15px;">+</button>
+        </div>
+        
+        <div id="loading" class="loading-container">
+            <div class="spinner"></div>
+        </div>
+        
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+        
+        <div id="shopping-items-container">
+            <!-- Shopping items will be dynamically inserted here -->
+        </div>
+
+        <!-- Add Item Modal -->
+        <div id="add-item-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 100;">
+            <div class="card" style="max-width: 400px; margin: 100px auto; padding: 20px;">
+                <h2>Add New Item</h2>
+                <form id="add-item-form">
+                    <div class="form-group">
+                        <label for="item-name" class="form-label">Item Name</label>
+                        <input type="text" id="item-name" class="form-control" required>
+                    </div>
+                    <div class="flex justify-between">
+                        <button type="button" id="cancel-add-item" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn">Add Item</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+     <div class="bottom-nav">
+        <a href="../dashboard.html" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="shopping.html" class="nav-item active">
+            <i class="fas fa-shopping-bag nav-icon"></i>
+            <span class="nav-text">Shopping</span>
+        </a>
+        <a href="../budget/budget.html" class="nav-item">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span class="nav-text">Budget</span>
+        </a>
+        <a href="../tasks.html" class="nav-item">
+            <i class="fas fa-check-circle nav-icon"></i>
+            <span class="nav-text">Tasks</span>
+        </a>
+        <a href="../vendors.html" class="nav-item">
+            <i class="fas fa-store nav-icon"></i>
+            <span class="nav-text">Vendors</span>
+        </a>
+        <a href="../profile.html" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">Profile</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase.js"></script>
+    <script src="../assets/js/shopping-items.js"></script>
+</body>
+</html> 

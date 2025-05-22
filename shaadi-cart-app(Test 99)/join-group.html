@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join Wedding Group - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="app-header">
+            <div class="logo">ShaadiCart</div>
+        </div>
+        <div class="auth-card card" style="max-width: 400px; margin: 40px auto; padding: 2rem 1.5rem;">
+            <h1 class="auth-title" style="font-size: 2.2rem; text-align: center; margin-bottom: 2rem;">Join a Wedding Group</h1>
+            <form id="join-group-form">
+                <div class="form-group">
+                    <label for="invite-code" class="form-label" style="font-size: 1.1rem;">Invite Code or Link</label>
+                    <input type="text" id="invite-code" class="form-control" required style="font-size: 1.2rem; padding: 0.8rem; margin-bottom: 1.5rem;">
+                </div>
+                <button type="submit" class="btn btn-block" style="font-size: 1.2rem; margin-bottom: 1.5rem;">Join Group</button>
+            </form>
+            <a href="create-group.html" class="btn btn-block" style="margin-top: 1.5rem;">Create New Wedding Group</a>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const isLoggedIn = await window.supabaseClient.isAuthenticated();
+            if (!isLoggedIn) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const joinGroupForm = document.getElementById('join-group-form');
+            joinGroupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const inviteCode = document.getElementById('invite-code').value.trim().toUpperCase();
+                try {
+                    // Get current user
+                    const user = await window.supabaseClient.getCurrentUser();
+                    // Find group by invite code
+                    const { data, error } = await supabase
+                        .from('wedding_groups')
+                        .select('id')
+                        .eq('invite_code', inviteCode)
+                        .single();
+                    if (error || !data) throw new Error('Invalid invite code');
+                    // Add user to group (default role: member)
+                    await window.supabaseClient.addUserToGroup(data.id, user.id, 'member');
+                    // Store current group ID
+                    localStorage.setItem('currentGroupId', data.id);
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } catch (error) {
+                    alert(error.message || 'Failed to join wedding group. Please check your invite code.');
+                }
+            });
+        });
+
+        // Basic client-side validation for input fields
+        function validateInput(inputElement) {
+            if (inputElement.checkValidity()) {
+                inputElement.classList.remove('is-invalid');
+                inputElement.classList.add('is-valid');
+            } else {
+                inputElement.classList.remove('is-valid');
+                inputElement.classList.add('is-invalid');
+            }
+        }
+
+        const inviteCodeInput = document.getElementById('invite-code');
+
+        inviteCodeInput.addEventListener('input', () => validateInput(inviteCodeInput));
+        inviteCodeInput.addEventListener('blur', () => validateInput(inviteCodeInput));
+
+    </script>
+</body>
+</html>

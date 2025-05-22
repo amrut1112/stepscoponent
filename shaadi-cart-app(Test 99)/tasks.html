@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Tasks - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container" style="padding-bottom: 70px;">
+        <div class="app-header">
+            <h1>Quick Tasks</h1>
+        </div>
+        
+        <!-- Filter Controls -->
+        <div class="task-filters" style="margin-bottom: 1rem;">
+            <button class="btn btn-secondary btn-sm active" data-filter="all">All</button>
+            <button class="btn btn-secondary btn-sm" data-filter="pending">Pending</button>
+            <button class="btn btn-secondary btn-sm" data-filter="completed">Completed</button>
+        </div>
+
+        <!-- Sorting Controls -->
+        <div class="task-sorting" style="margin-bottom: 1rem;">
+            <label for="sort-tasks" style="margin-right: 10px;">Sort by:</label>
+            <select id="sort-tasks" class="form-control" style="display: inline-block; width: auto;">
+                <option value="created_at_asc">Creation Date (Oldest First)</option>
+                <option value="created_at_desc">Creation Date (Newest First)</option>
+                <option value="due_date_asc">Due Date (Soonest First)</option>
+                <option value="due_date_desc">Due Date (Latest First)</option>
+            </select>
+        </div>
+
+        <div id="task-list">
+            <!-- Tasks will be loaded here -->
+        </div>
+        
+        <!-- Add Task Form (Optional - can be a modal or inline) -->
+        <div class="add-task-section">
+            <input type="text" id="new-task-input" placeholder="Add a new task...">
+            <input type="date" id="new-task-due-date">
+            <button id="add-task-btn">Add</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (Optional - copy from dashboard or include) -->
+    <!-- Example: Include bottom navigation -->
+    <div class="bottom-nav">
+        <a href="dashboard.html" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="shopping/shopping.html" class="nav-item">
+            <i class="fas fa-shopping-bag nav-icon"></i>
+            <span class="nav-text">Shopping</span>
+        </a>
+        <a href="budget/budget.html" class="nav-item">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span class="nav-text">Budget</span>
+        </a>
+        <a href="tasks.html" class="nav-item active">
+            <i class="fas fa-check-circle nav-icon"></i>
+            <span class="nav-text">Tasks</span>
+        </a>
+        <a href="vendors.html" class="nav-item">
+             <i class="fas fa-store nav-icon"></i>
+             <span class="nav-text">Vendors</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">Profile</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <!-- Link to a new tasks.js file -->
+    <script src="assets/js/tasks.js"></script>
+</body>
+</html> 
+</html> 

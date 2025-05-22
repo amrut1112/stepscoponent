@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Lists - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+    <div class="container" style="padding-bottom: 70px;">
+        <div class="flex justify-between items-center p-2">
+            <h1>Shopping Lists</h1>
+            <button id="add-category-btn" class="btn" style="font-size: 1.5rem; padding: 5px 15px;">+</button>
+        </div>
+        
+        <div id="loading" class="loading-container">
+            <div class="spinner"></div>
+        </div>
+        
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+        
+        <div id="shopping-lists-container">
+            <!-- Shopping lists will be dynamically inserted here -->
+        </div>
+        
+        <div id="add-category-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 100;">
+            <div class="card" style="max-width: 400px; margin: 100px auto; padding: 20px;">
+                <h2>Add New Category</h2>
+                <form id="add-category-form">
+                    <div class="form-group">
+                        <label for="category-name" class="form-label">Category Name</label>
+                        <input type="text" id="category-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="category-budget" class="form-label">Budget Allocation (₹)</label>
+                        <input type="number" id="category-budget" class="form-control" required min="0">
+                    </div>
+                    <div class="flex justify-between">
+                        <button type="button" id="cancel-add-category" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn">Add Category</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="../dashboard.html" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="shopping.html" class="nav-item active">
+            <i class="fas fa-shopping-bag nav-icon"></i>
+            <span class="nav-text">Shopping</span>
+        </a>
+        <a href="../budget/budget.html" class="nav-item">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span class="nav-text">Budget</span>
+        </a>
+        <a href="../tasks.html" class="nav-item">
+            <i class="fas fa-check-circle nav-icon"></i>
+            <span class="nav-text">Tasks</span>
+        </a>
+        <a href="../vendors.html" class="nav-item">
+            <i class="fas fa-store nav-icon"></i>
+            <span class="nav-text">Vendors</span>
+        </a>
+        <a href="../profile.html" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">Profile</span>
+        </a>
+    </div>
+
+    <!-- Templates -->
+    <template id="shopping-category-template">
+        <div class="card shopping-category" data-id="">
+            <h2 class="category-name"></h2>
+            <p class="category-progress"></p>
+            <p class="category-budget"></p>
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            <a href="#" class="view-category-link" style="display: block; text-align: right;">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase.js"></script>
+    <script src="../assets/js/shopping.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShaadiCart - Wedding Planning Made Easy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="welcome-container">
+        <div class="app-header">
+            <div class="logo">ShaadiCart</div>
+        </div>
+        
+        <h1 class="welcome-title">Welcome to ShaadiCart!</h1>
+        <p class="welcome-subtitle">Plan your wedding shopping together</p>
+        
+        <div class="welcome-actions">
+            <a href="create-group.html" class="btn btn-block">Create New Wedding Group</a>
+            <a href="join-group.html" class="btn btn-block btn-secondary">Join Existing Wedding Group</a>
+        </div>
+        
+        <div class="welcome-login">
+            <!-- Removed: <p>Already have an account? <a href="login.html" class="auth-link">Login</a></p> -->
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const isLoggedIn = await window.supabaseClient.isAuthenticated();
+                if (!isLoggedIn) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                const user = await window.supabaseClient.getCurrentUser();
+                const groups = await window.supabaseClient.getUserGroups(user.id);
+                if (groups && groups.length > 0) {
+                    window.location.href = 'dashboard.html';
+                }
+                // else: stay on this page and show create/join options
+            } catch (error) {
+                console.error('Authentication check failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>

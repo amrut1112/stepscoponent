@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="app-header">
+            <div class="logo">ShaadiCart</div>
+        </div>
+        
+        <div class="auth-card card">
+            <h1 class="auth-title">Create an Account</h1>
+            
+            <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+            
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" class="form-control" required minlength="6">
+                    <small class="form-text text-muted">Password must be at least 6 characters</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm-password" class="form-label">Confirm Password</label>
+                    <input type="password" id="confirm-password" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-block">Sign Up</button>
+            </form>
+            
+            <div class="auth-footer">
+                <p class="mt-2">Already have an account? <a href="login.html" class="auth-link">Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupForm = document.getElementById('signup-form');
+            const errorMessage = document.getElementById('error-message');
+            
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                
+                // Validate passwords match
+                if (password !== confirmPassword) {
+                    errorMessage.textContent = 'Passwords do not match';
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+                
+                try {
+                    errorMessage.style.display = 'none';
+                    
+                    // Sign up user
+                    const data = await window.supabaseClient.signUp(email, password, name);
+                    
+                    // Redirect to create group page
+                    window.location.href = 'create-group.html';
+                } catch (error) {
+                    errorMessage.textContent = error.message || 'Failed to create account. Please try again.';
+                    errorMessage.style.display = 'block';
+                }
+            });
+        });
+
+        // Basic client-side validation for input fields
+        function validateInput(inputElement) {
+            if (inputElement.checkValidity()) {
+                inputElement.classList.remove('is-invalid');
+                inputElement.classList.add('is-valid');
+            } else {
+                inputElement.classList.remove('is-valid');
+                inputElement.classList.add('is-invalid');
+            }
+        }
+
+        const nameInput = document.getElementById('name');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const errorMessage = document.getElementById('error-message'); // Get the error message element again
+
+        nameInput.addEventListener('input', () => validateInput(nameInput));
+        nameInput.addEventListener('blur', () => validateInput(nameInput));
+
+        emailInput.addEventListener('input', () => validateInput(emailInput));
+        emailInput.addEventListener('blur', () => validateInput(emailInput));
+
+        // Password and Confirm Password validation
+        function validatePasswords() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const passwordMatch = password === confirmPassword;
+
+            // Validate password based on its own constraints (like minlength)
+            if (passwordInput.checkValidity() && passwordMatch) {
+                 passwordInput.classList.remove('is-invalid');
+                 passwordInput.classList.add('is-valid');
+            } else {
+                 passwordInput.classList.remove('is-valid');
+                 passwordInput.classList.add('is-invalid');
+            }
+
+            // Validate confirm password based on matching the password
+            if (confirmPasswordInput.checkValidity() && passwordMatch && password !== '') {
+                 confirmPasswordInput.classList.remove('is-invalid');
+                 confirmPasswordInput.classList.add('is-valid');
+            } else {
+                 confirmPasswordInput.classList.remove('is-valid');
+                 confirmPasswordInput.classList.add('is-invalid');
+            }
+
+             // Display a specific error message if passwords don't match and are not empty
+             if (password !== confirmPassword && confirmPassword !== '') {
+                errorMessage.textContent = 'Passwords do not match';
+                errorMessage.style.display = 'block';
+            } else if (passwordInput.checkValidity() === false) {
+                 errorMessage.textContent = passwordInput.validationMessage; // Show browser's default message
+                 errorMessage.style.display = 'block';
+            } else {
+                errorMessage.style.display = 'none'; // Hide error message if valid
+            }
+        }
+
+        passwordInput.addEventListener('input', validatePasswords);
+        passwordInput.addEventListener('blur', validatePasswords);
+        confirmPasswordInput.addEventListener('input', validatePasswords);
+        confirmPasswordInput.addEventListener('blur', validatePasswords);
+
+    </script>
+</body>
+</html>

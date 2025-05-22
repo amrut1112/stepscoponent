@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker - ShaadiCart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container" style="padding-bottom: 70px;">
+        <div class="app-header">
+            <h1>Budget Tracker</h1>
+        </div>
+        
+        <div id="loading" class="loading-container">
+            <div class="spinner"></div>
+        </div>
+        
+        <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+        
+        <div id="budget-summary" class="card mb-3" style="display: none;">
+            <h2>Overall Wedding Budget</h2>
+            <div class="flex justify-between mb-1">
+                <span>Total Allocated:</span>
+                <span id="total-allocated">₹0</span>
+            </div>
+            <div class="flex justify-between mb-1">
+                <span>Total Spent:</span>
+                <span id="total-spent">₹0</span>
+            </div>
+            <div class="flex justify-between mb-1">
+                <span>Remaining:</span>
+                <span id="remaining">₹0</span>
+            </div>
+            <div class="progress-container">
+                <div id="overall-progress" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="text-right" id="percentage-spent">0% Spent</div>
+        </div>
+        
+        <h2>Category Breakdown</h2>
+        <div id="category-breakdown-section">
+            <!-- Container for the pie chart -->
+            <div id="pie-chart-container" style="position: relative; height: 200px; width: 100%; margin-bottom: 20px;">
+                 <canvas id="category-pie-chart"></canvas>
+            </div>
+            
+            <!-- Container for dynamic category items -->
+            <div id="category-items-container">
+                <!-- Categories will be dynamically inserted here by JavaScript -->
+            </div>
+        </div>
+        
+        <h2 class="mt-4">Recent Transactions</h2>
+        <div id="recent-transactions">
+            <!-- Transactions will be dynamically inserted here -->
+        </div>
+        
+        <div class="text-center mt-4">
+            <button id="add-expense-btn" class="btn">
+                <i class="fas fa-plus"></i> Add Expense
+            </button>
+        </div>
+        
+        <!-- Add Expense Modal -->
+        <div id="add-expense-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 100;">
+            <div class="card" style="max-width: 400px; margin: 100px auto; padding: 20px;">
+                <h2>Add New Expense</h2>
+                <form id="add-expense-form">
+                    <div class="form-group">
+                        <label for="expense-category" class="form-label">Category</label>
+                        <select id="expense-category" class="form-control" required>
+                            <option value="Venue">Venue</option>
+                            <option value="Catering">Catering</option>
+                            <option value="Decor">Decor</option>
+                            <option value="Photography">Photography</option>
+                            <option value="Entertainment">Entertainment</option>
+                            <option value="Flowers">Flowers</option>
+                            <option value="Miscellaneous">Miscellaneous</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-amount" class="form-label">Amount (₹)</label>
+                        <input type="number" id="expense-amount" class="form-control" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-description" class="form-label">Description</label>
+                        <input type="text" id="expense-description" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="expense-date" class="form-label">Date</label>
+                        <input type="date" id="expense-date" class="form-control" required>
+                    </div>
+                    <div class="flex justify-between">
+                        <button type="button" id="cancel-add-expense" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn">Add Expense</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="../dashboard.html" class="nav-item">
+            <i class="fas fa-home nav-icon"></i>
+            <span class="nav-text">Home</span>
+        </a>
+        <a href="../shopping/shopping.html" class="nav-item">
+            <i class="fas fa-shopping-bag nav-icon"></i>
+            <span class="nav-text">Shopping</span>
+        </a>
+        <a href="budget.html" class="nav-item active">
+            <i class="fas fa-money-bill-wave nav-icon"></i>
+            <span class="nav-text">Budget</span>
+        </a>
+        <a href="../tasks.html" class="nav-item">
+            <i class="fas fa-check-circle nav-icon"></i>
+            <span class="nav-text">Tasks</span>
+        </a>
+        <a href="../vendors.html" class="nav-item">
+            <i class="fas fa-store nav-icon"></i>
+            <span class="nav-text">Vendors</span>
+        </a>
+        <a href="../profile.html" class="nav-item">
+            <i class="fas fa-user nav-icon"></i>
+            <span class="nav-text">Profile</span>
+        </a>
+    </div>
+
+    <!-- Templates -->
+    <template id="category-item-template">
+        <div class="card mb-2 category-item" data-id="">
+            <div class="flex justify-between items-center">
+                <div style="flex-grow: 1; margin-right: 10px;">
+                    <h3 class="category-name"></h3>
+                    <p class="category-amounts" style="font-size: 0.9rem; color: var(--text-light);"></p>
+                </div>
+                <div style="width: 60%;">
+                    <div class="progress-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <template id="transaction-item-template">
+        <div class="card mb-2 transaction-item" data-id="">
+            <div class="flex justify-between items-center">
+                <div>
+                    <div class="transaction-date"></div>
+                    <div class="transaction-description"></div>
+                </div>
+                <div>
+                    <div class="transaction-amount"></div>
+                    <div class="transaction-category"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../assets/js/supabase.js"></script>
+    <script src="../assets/js/budget.js"></script>
+</body>
+</html>
